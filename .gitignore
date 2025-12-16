@@ -9,6 +9,10 @@ __pycache__/
 db.sqlite3
 /media/
 /staticfiles/
+logs/
+
+# Temporary files
+**/response_*
 
 # VSCode
 .vscode/

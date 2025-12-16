@@ -1,353 +1,197 @@
-# MyShop E-Commerce Application
+# MyShop - Secure E-commerce Application
 
-A secure Django e-commerce web application with user authentication, role-based access control, shopping cart functionality, and comprehensive security hardening.
+## Overview
+A Django-based e-commerce application that demonstrates comprehensive web security implementations. This project was developed as part of a Secure Web Development course to showcase vulnerability identification, threat modeling, and security hardening techniques.
 
-## Project Overview
+## Security Features Implemented
 
-**Purpose:** Demonstrate a production-ready secure web application with modern security practices integrated throughout the development lifecycle.
+### 🔒 SQL Injection Prevention
+- Replaced vulnerable raw SQL queries with Django ORM
+- Implemented parameterized queries using Q objects
+- All database operations now use safe ORM methods
 
-**Key Security Focus:**
-- User authentication and session management with CSRF protection
-- Role-based access control (Customer vs. Staff/Admin)
-- Input validation and output encoding to prevent XSS and SQL injection
-- Secure configuration with environment-based secrets management
-- Audit logging for tracking business-critical events
-- Security headers and middleware for modern web security
+### 🛡️ XSS Protection
+- Removed unsafe template filters (`|safe`)
+- Implemented proper output escaping
+- All user-generated content is automatically sanitized
 
-## Features
+### 🔐 Authentication & Authorization
+- Secure password hashing using PBKDF2
+- Role-based access control (staff vs regular users)
+- Session management with rotation to prevent fixation
 
-### Core Functionality
-- **User Management**: Registration, login, logout, and profile management
-- **Product Catalog**: Browse and display products with images
-- **Shopping Cart**: Add/update/remove items; persist cart across sessions and logins
-- **Checkout**: Create orders from cart items
-- **Admin Dashboard**: Staff-only access to manage products and view orders
+### 🛡️ CSRF Protection
+- Django's CSRF middleware enabled
+- All forms include `{% csrf_token %}` protection
+- State-changing operations require valid tokens
 
-### Security Features
-1. **Authentication & Authorization**
-   - User registration with email validation and strong password enforcement
-   - Secure login with session rotation to prevent session fixation
-   - Role-based access control (RBAC) using Django Groups: Customer, Staff, Admin
-   - Custom permission decorators for fine-grained access control
-   - Customer profile model to track customer data securely
-
-2. **Session & CSRF Protection**
-   - `SESSION_COOKIE_HTTPONLY=True` prevents JavaScript access to session cookies
-   - `CSRF_COOKIE_HTTPONLY=False` (configurable for client-side CSRF token retrieval)
-   - Session key rotation on login
-   - All forms include CSRF token validation via Django middleware
-
-3. **Input Validation & Output Encoding**
-   - Django Forms with built-in validators (price > 0, email format, etc.)
-   - Server-side quantity validation (must be positive integer)
-   - Template auto-escaping to prevent XSS
-   - SQL injection prevention via Django ORM parameterized queries
-
-4. **Error Handling & Logging**
-   - Structured logging to file and console
-   - Audit logs for sensitive actions (login, order placement, product changes)
-   - Safe error pages in production (DEBUG=False) to avoid information disclosure
-   - Exception logging without exposing stack traces to users
-
-5. **Security Headers & Middleware**
-   - `SECURE_BROWSER_XSS_FILTER=True`
-   - `SECURE_CONTENT_TYPE_NOSNIFF=True`
-   - `X_FRAME_OPTIONS='DENY'` (prevents clickjacking)
-   - Django SecurityMiddleware included
+## Technology Stack
+- **Framework:** Django 4.x
+- **Database:** SQLite (development)
+- **Frontend:** HTML5, CSS3, JavaScript
+- **Authentication:** Django Auth System
+- **Security:** Django Security Middleware
 
 ## Project Structure
-
 ```
 myshop_app/
-├── myshop/                          # Django project settings
-│   ├── settings.py                  # Configuration with security hardening
-│   ├── urls.py                      # Project-level URL routing
-│   ├── wsgi.py                      # WSGI application
-│   └── asgi.py                      # ASGI application
-├── store/                           # Main Django app
-│   ├── models.py                    # Product, Cart, Order, User models
-│   ├── views.py                     # All application views
-│   ├── urls.py                      # App-level URL routing
-│   ├── forms.py                     # Forms with validation
-│   ├── admin.py                     # Django admin configuration
-│   ├── tests.py                     # Unit & security tests
-│   ├── migrations/                  # Database migrations
-│   └── templates/store/             # HTML templates
-│       ├── home.html                # Product listing
-│       ├── register.html            # User registration
-│       ├── login.html               # User login
-│       ├── profile.html             # User profile
-│       ├── cart.html                # Shopping cart
-│       ├── checkout.html            # Checkout page
-│       ├── manage_products.html     # Staff product management
-│       ├── add_product.html         # Staff add product
-│       ├── edit_product.html        # Staff edit product
-│       └── delete_product.html      # Staff delete product
-├── logs/                            # Application logs (created on first run)
-├── requirements.txt                 # Python dependencies
-├── db.sqlite3                       # SQLite database (development only)
-├── manage.py                        # Django management script
-├── pytest.ini                       # Pytest configuration
-├── SECURITY.md                      # Security documentation (DFD, threat modeling)
-└── .gitignore                       # Git ignore rules
+├── store/
+│   ├── models.py          # Data models (Product, Cart, Order, etc.)
+│   ├── views.py           # Business logic and security implementations
+│   ├── forms.py           # Input validation forms
+│   ├── templates/store/   # HTML templates with security
+│   ├── urls.py           # URL routing
+│   └── management/commands/  # Custom management commands
+├── manage.py
+├── requirements.txt
+└── README.md
 ```
 
-## Setup & Installation
+## Setup Instructions
 
 ### Prerequisites
 - Python 3.8+
 - pip package manager
-- Virtual environment (recommended)
 
-### Steps
-
-1. **Clone and navigate to project:**
+### Installation
+1. **Clone the repository**
    ```bash
+   git clone [your-github-repo-url]
    cd myshop_app
    ```
 
-2. **Create and activate virtual environment:**
-   ```powershell
+2. **Create virtual environment**
+   ```bash
    python -m venv venv
-   .\venv\Scripts\Activate.ps1
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
-3. **Install dependencies:**
-   ```powershell
-   python -m pip install --upgrade pip
+3. **Install dependencies**
+   ```bash
    pip install -r requirements.txt
    ```
 
-4. **Create logs directory:**
-   ```powershell
-   mkdir logs
-   ```
-
-5. **Run migrations:**
-   ```powershell
-   python manage.py makemigrations
+4. **Run database migrations**
+   ```bash
    python manage.py migrate
    ```
 
-6. **Create a superuser (admin account):**
-   ```powershell
+5. **Create superuser account**
+   ```bash
    python manage.py createsuperuser
-   # Enter username, email, password
    ```
 
-7. **Start development server:**
-   ```powershell
+6. **Run the development server**
+   ```bash
    python manage.py runserver
    ```
 
-8. **Access the application:**
-   - Homepage: http://localhost:8000/
-   - Admin panel: http://localhost:8000/admin/
+7. **Access the application**
+   - Open http://127.0.0.1:8000 in your browser
+   - Admin panel: http://127.0.0.1:8000/admin/
 
-## Usage
+## Security Testing
 
-### For Customers
-1. **Register:** Click "Register" and create an account with email and password (password must be 8+ chars with uppercase/numbers)
-2. **Browse Products:** View available products on the homepage
-3. **Add to Cart:** Click "Add to cart" on any product, adjust quantity
-4. **Checkout:** Review cart, proceed to checkout, place order
-5. **Profile:** Update contact information in your profile
+### SQL Injection Testing
+Test the search functionality with malicious payloads:
+- Search for: `' OR '1'='1` (should return filtered results, not all products)
+- Search for: `'; DROP TABLE store_product;--` (should fail safely)
 
-### For Staff/Admin
-1. **Login:** Use a staff account (created via Django admin)
-2. **Manage Products:** Navigate to `/staff/products/` to view, add, edit, or delete products
-3. **View Orders:** Navigate to `/staff/orders/` to see all placed orders
-4. **Admin Panel:** Access `/admin/` for full Django admin
+### XSS Testing
+Test product display and search with script payloads:
+- Search for: `<script>alert('XSS')</script>` (should display as text, not execute)
+- Product names/descriptions with script tags (should be escaped)
 
-## Security Improvements Implemented
+### Authentication Testing
+- Attempt to access admin pages without staff privileges
+- Test session timeout and rotation
+- Verify password reset functionality
 
-| Requirement ID | Requirement | Status | Implementation |
-|---|---|---|---|
-| SR-1 | User Authentication with Strong Passwords | Completed | Django UserCreationForm, password validators, PBKDF2 hashing |
-| SR-2 | Session Management & Fixation Prevention | Completed | `session_key.cycle_key()` on login, `SESSION_COOKIE_HTTPONLY=True` |
-| SR-3 | CSRF Protection | Completed | Django CSRF middleware, `{% csrf_token %}` in all forms |
-| SR-4 | Input Validation & Output Encoding | Completed | Django Forms validators, template auto-escaping |
-| SR-5 | Authorization & Role-Based Access Control | Completed | `@user_passes_test(is_staff)` decorators, Customer/Staff roles |
-| SR-6 | Secure Configuration | Completed | Environment-based settings, security headers, disabled DEBUG in production |
-| SR-7 | Logging & Auditing | Completed | Structured logging to `logs/app.log`, audit trail for key events |
-| SR-8 | Error Handling | Completed | Safe error pages, no stack trace disclosure to users |
+## Key Security Improvements
 
-## SQL Injection & XSS Attack Demonstrations
+### Before vs After
 
-To demonstrate security vulnerabilities and their prevention, here are examples of how SQL Injection and XSS attacks could occur and how this application prevents them.
-
-### SQL Injection Prevention
-
-**Vulnerable Code Example (DO NOT USE):**
+**SQL Injection Vulnerability (BEFORE):**
 ```python
-# This would be vulnerable to SQL injection
-def vulnerable_search(query):
-    cursor = connection.cursor()
-    cursor.execute(f"SELECT * FROM products WHERE name LIKE '%{query}%'")  # UNSAFE!
-    return cursor.fetchall()
+# VULNERABLE - Raw SQL with string concatenation
+cursor.execute("SELECT * FROM store_product WHERE 1=1")
 ```
 
-**Secure Implementation (Used in this app):**
+**SQL Injection Prevention (AFTER):**
 ```python
-# From store/views.py - home view
-def home(request):
-    query = request.GET.get('q', '')
-    if query:
-        # Secure search using Django ORM to prevent SQL injection
-        products = Product.objects.filter(
-            models.Q(name__icontains=query) | models.Q(description__icontains=query)
-        )
-    else:
-        products = Product.objects.all()
-    return render(request, 'store/home.html', {'products': products, 'query': query})
+# SECURE - Django ORM with safe queries
+products = Product.objects.filter(
+    Q(name__icontains=query) |
+    Q(description__icontains=query)
+)
 ```
 
-**Attack Demonstration:**
-- Malicious input: `' OR '1'='1` in search field
-- Vulnerable code would return all products
-- Secure code safely filters using parameterized queries
-
-### XSS (Cross-Site Scripting) Prevention
-
-**Vulnerable Template Example (DO NOT USE):**
+**XSS Vulnerability (BEFORE):**
 ```html
-<!-- This would be vulnerable to XSS -->
-<div>Product: {{ product.name|safe }}</div>  <!-- UNSAFE! -->
+<!-- VULNERABLE - Unsafe template filter -->
+<h2>{{ product.name|safe }}</h2>
 ```
 
-**Secure Implementation (Used in this app):**
+**XSS Protection (AFTER):**
 ```html
-<!-- From store/templates/store/home.html -->
-<div class="card-title">{{ product.name }}</div>  <!-- SAFE: Auto-escaped -->
+<!-- SECURE - Automatic escaping -->
+<h2>{{ product.name }}</h2>
 ```
 
-**Attack Demonstration:**
-- Malicious input: `<script>alert('XSS')</script>` in product name
-- Vulnerable template would execute JavaScript
-- Secure template auto-escapes HTML characters
+## Features
 
-**Form Validation Against XSS:**
-```python
-# From store/forms.py - ProductForm
-def clean_name(self):
-    """Validate name is not empty and properly formatted."""
-    name = self.cleaned_data.get('name', '').strip()
-    if not name:
-        raise ValidationError("Product name cannot be empty.")
-    if len(name) > 100:
-        raise ValidationError("Product name is too long.")
-    # Check for potentially harmful characters
-    if '<' in name or '>' in name or '&' in name:
-        raise ValidationError("Product name contains invalid characters.")
-    return name
-```
+### User Features
+- User registration and login
+- Product browsing and search
+- Shopping cart functionality
+- Order placement and history
+- User profile management
 
-### Testing Vulnerabilities
+### Admin Features (Staff Only)
+- Product management (CRUD operations)
+- Order management and viewing
+- User management
+- Category management
 
-Run the included tests to verify security measures:
-```bash
-pytest store/tests.py -v
-```
+## Security Considerations
 
-Key security tests include:
-- Input validation for malicious payloads
-- SQL injection attempt prevention
-- XSS payload sanitization
+### Threat Modeling
+- SQL Injection: Prevented by ORM usage
+- XSS: Prevented by template escaping
+- CSRF: Prevented by token validation
+- Authentication Bypass: Prevented by secure auth system
+- Authorization Bypass: Prevented by role decorators
 
-## Testing
+### Security Headers
+The application includes security headers for:
+- Content Security Policy (CSP)
+- HTTP Strict Transport Security (HSTS)
+- X-Frame-Options
+- X-Content-Type-Options
 
-### Run All Tests
-```powershell
-pytest
-```
+## Testing Results
 
-### Run Specific Test Class
-```powershell
-pytest store/tests.py::AuthenticationTests -v
-```
+### Vulnerability Assessment
+- SQL Injection: Mitigated
+- XSS: Mitigated
+- CSRF: Protected
+- Authentication: Secure
+- Authorization: Implemented
 
-### Run with Coverage
-```powershell
-pip install pytest-cov
-pytest --cov=store store/tests.py
-```
-
-### Security Tests Included
-- **Authentication:** Registration, login, invalid credentials, email uniqueness
-- **Authorization:** Staff-only access, role enforcement
-- **Cart & Checkout:** Session carts, user carts, cart merging, order creation
-- **Input Validation:** Price validation, quantity validation, XSS prevention
-- **CSRF:** Token requirement on forms
-
-### Static Analysis (SAST)
-
-**Run Bandit (security linter):**
-```powershell
-bandit -r .
-```
-
-**Run pip-audit (dependency vulnerability scanner):**
-```powershell
-pip-audit
-```
-
-## Deployment Considerations
-
-### Production Checklist
-- [ ] Set `DEBUG=False` and provide `DJANGO_SECRET_KEY` environment variable
-- [ ] Set `DJANGO_ALLOWED_HOSTS` to your production domain
-- [ ] Use HTTPS and set `SESSION_COOKIE_SECURE=True`, `CSRF_COOKIE_SECURE=True`
-- [ ] Configure production database (PostgreSQL recommended)
-- [ ] Use a production WSGI server (Gunicorn, uWSGI)
-- [ ] Set up log rotation and monitoring
-- [ ] Run security audit: `bandit -r . && pip-audit`
-- [ ] Use environment variables for sensitive data
-
-### Environment Variables
-```
-DJANGO_SECRET_KEY=<strong-random-key>
-DJANGO_DEBUG=False
-DJANGO_ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
-DJANGO_LOG_LEVEL=WARNING
-```
-
-## Development Notes
-
-### Session Cart → User Cart Flow
-When a user logs in after adding items to their session cart:
-1. Session cart is fetched using `session_key`
-2. `CustomerProfile.merge_session_cart_to_user()` is called
-3. Items are moved to the user's persistent cart
-4. Session cart is deleted to avoid orphan records
-
-### Password Security
-- Django's PBKDF2 hasher uses 260,000 iterations (OWASP recommended minimum: 100,000)
-- Passwords are never logged or displayed in plaintext
-- Password validators enforce complexity (8+ chars, uppercase, numbers)
-
-### Logging
-- **Log file location:** `logs/app.log`
-- **Key logged events:**
-  - User registration
-  - Login/logout with username (not password)
-  - Product management actions
-  - Order creation
-  - Authentication failures
+### Test Cases Executed
+1. SQL Injection Test: Attempted injection via search - Result: Safe failure
+2. XSS Test: Script injection attempts - Result: Content escaped
+3. CSRF Test: Token validation - Result: Requests blocked without tokens
+4. Auth Test: Unauthorized access attempts - Result: Access denied
 
 ## Contributing
 
-1. Create a feature branch: `git checkout -b feature/feature-name`
-2. Commit changes: `git commit -am 'Add feature'`
-3. Push to branch: `git push origin feature/feature-name`
-4. Submit a pull request
+This project demonstrates secure coding practices for educational purposes. For security research or vulnerability disclosure, please follow responsible disclosure guidelines.
 
-## Security Reporting
+## License
 
-If you discover a security vulnerability, please email security@myshop.local. Do not publicly disclose the issue.
+This project is developed for educational purposes as part of the Secure Web Development course at National College of Ireland.
 
-## References
+## Contact
 
-- Django Security Documentation: https://docs.djangoproject.com/en/stable/topics/security/
-- OWASP Top 10: https://owasp.org/Top10/
-- CWE/SANS Top 25: https://cwe.mitre.org/top25/
-- Django Password Hashing: https://docs.djangoproject.com/en/stable/topics/auth/passwords/
+For questions about this project, please refer to the technical report submitted as part of the course assessment.
