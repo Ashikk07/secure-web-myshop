@@ -1,2 +1,18 @@
-# Created by pytest automatically.
-*
+# Virtual environment
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Django
+db.sqlite3
+/media/
+/staticfiles/
+
+# VSCode
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
